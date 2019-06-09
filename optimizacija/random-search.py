@@ -12,7 +12,7 @@ from matplotlib import pyplot as plt
 CONDITION = True
 GENERATIONS = 20
 POPULATION_SIZE = 20
-
+NOTE="Random search"
 def genPopulation(geneList):
     for i in range(POPULATION_SIZE):
         g = Gene()
@@ -43,10 +43,10 @@ for i in range(GENERATIONS):
 
 
 DELTA = best_fit[0]-best_fit[GENERATIONS-1]
-
 #PLOTTING
+
 plt.figure()
-plt.title("Change of q1 and q2")
+plt.title("Change of q1 and q2, "+NOTE)
 plt.plot(genes[0].q1)
 plt.plot(genes[0].q2)
 plt.scatter(np.arange(0, len(genes[0].q1)), genes[0].q1, label="q1")
@@ -57,7 +57,7 @@ plt.legend(loc="upper left")
 plt.show()
 
 plt.figure()
-plt.title("Change of torques")
+plt.title("Change of torques, "+NOTE)
 plt.plot(genes[0].tau1)
 plt.plot(genes[0].tau2)
 plt.plot(genes[0].tau3)
@@ -72,11 +72,13 @@ plt.legend(loc="upper left")
 plt.show()
 
 plt.figure()
-plt.title("Random search\nPopulation = "+str(POPULATION_SIZE)+ ", $\\Delta = $" + str(DELTA)[0:4])
+plt.title(NOTE+"\nPopulation = "+str(POPULATION_SIZE) +
+          ", $\\Delta = $" + str(DELTA)[0:4])
 
 plt.xlabel("Generation")
 plt.ylabel("Fitness")
-plt.plot(best_fit, label="$\sum \sqrt{\\tau_1^2+\\tau_2^2+\\tau_3^2+\\tau_4^2}$")
+plt.plot(
+    best_fit, label="$\sum \sqrt{\\tau_1^2+\\tau_2^2+\\tau_3^2+\\tau_4^2}$")
 plt.legend(loc='upper right')
 
 plt.show()

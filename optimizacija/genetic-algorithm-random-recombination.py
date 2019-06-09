@@ -17,26 +17,14 @@ if MUTATION_CHANCE > 100:
         MUTATION_CHANCE = 100.0
 if MUTATION_CHANCE < 0:
         MUTATION_CHANCE = 0.0
+NOTE="GA - random recomb."
 
-CROSSOVER_CHANCE = 80.0
-if CROSSOVER_CHANCE > 100:
-        CROSSOVER_CHANCE = 100.0
-if CROSSOVER_CHANCE < 0:
-        CROSSOVER_CHANCE = 0.0
-
-F=1.2 #Fe[0,2]
-if F>2.0:
-        F=2.0
-if F<0.0:
-        F=0.0
-NOTE = "Differential Evolution"
-print("PARAMETERS\n")
 print(NOTE)
+print("PARAMETERS\n")
 print("Generations: ", GENERATIONS)
 print("Population size: ", POPULATION_SIZE)
-print("Mutation chance: ", MUTATION_CHANCE)
-print("Crossover chance: ", CROSSOVER_CHANCE)
-print("\n")
+print("Mutation chance: ", MUTATION_CHANCE, "%")
+print("\n\n")
 
 
 def genPopulation(geneList):
@@ -56,30 +44,38 @@ for i in range(GENERATIONS):
 
     print(int(((i+1)/GENERATIONS)*100), "%", "DONE", end="\r")
     #genes[:] = []
+    #sort
     
     #for x in genes:
     #    print(x.fitness)
-
-    #delete worse half of survivors
-    for n in range(len(genes)):
-        x = genes[n]
-        (a,b,c) = random.sample(genes, 3)
-        g = Gene()
-        g.setParameters(a1=a.a1+F*(b.a1-c.a1),a2=a.a2+F*(b.a2-c.a2))
-        if g.fitness < x.fitness:
-                genes[n] = g
-
-    #sort
-    genes.sort(key=lambda x: x.fitness, reverse=False)
     #store best
-    best_fit.append(genes[0].fitness)
     
-DELTA = best_fit[0]-best_fit[len(best_fit)-1]
+    #delete worse half of survivors
+    del genes[-floor(len(genes)/2):]
+
+    #refill the population
+    for i in range(POPULATION_SIZE-len(genes)):
+        (geneA, geneB) = random.sample(genes, 2)
+        #print("A", geneA.a1, geneA.a2)
+        #print("B",geneB.a1, geneB.a2)
+        g = Gene()
+        g.setParameters(a1=random.choice([geneA.a1, geneB.a1]), a2=random.choice([geneA.a1, geneB.a1]))
+        #random mutation
+        if random.random() < MUTATION_CHANCE/100:
+                #print("RANDOM MUTATION")
+                g.setParameters(a1=random.choice(populationValues),
+                                a2=random.choice(populationValues))
+        genes.append(g)
+
+    genes.sort(key=lambda x: x.fitness, reverse=False)
+    best_fit.append(genes[0].fitness)
+DELTA = best_fit[0]-best_fit[GENERATIONS-1]
 
 #PLOTTING
 
 plt.figure()
 plt.title("Change of q1 and q2, "+NOTE)
+
 plt.plot(genes[0].q1)
 plt.plot(genes[0].q2)
 plt.scatter(np.arange(0, len(genes[0].q1)), genes[0].q1, label="q1")

@@ -14,7 +14,7 @@ t1I = 0
 t1F = 2
 t2I = 0
 t2F = 2
-genes = list(np.arange(-10, 10, 0.0001))
+populationValues = list(np.arange(-10, 10, 0.0001))
 
 class Gene:
 
@@ -107,7 +107,7 @@ class Gene:
         torques = np.array([self.tau1, self.tau2, self.tau3, self.tau4]).reshape(20,4)
         
         self.fitness = np.sum(np.sqrt(np.sum(np.square(torques))))
-
+    
     def __init__(self):
         #clear any stovaways
         self.q1[:] = []
@@ -121,9 +121,28 @@ class Gene:
         self.tau3[:] = []
         self.tau4[:] = []
 
-        self.a1 = random.choice(genes)
-        self.a2 = random.choice(genes)
+        self.a1 = random.choice(populationValues)
+        self.a2 = random.choice(populationValues)
 
+        self.calcAllFromA()
+        self.calcTaus()
+        self.getFitness()
+
+    def setParameters(self, a1, a2):
+        self.a1=a1
+        self.a2=a2
+
+        self.q1[:] = []
+        self.q2[:] = []
+        self.dq1[:] = []
+        self.dq2[:] = []
+        self.ddq1[:] = []
+        self.ddq2[:] = []
+        self.tau1[:] = []
+        self.tau2[:] = []
+        self.tau3[:] = []
+        self.tau4[:] = []
+        
         self.calcAllFromA()
         self.calcTaus()
         self.getFitness()

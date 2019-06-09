@@ -10,32 +10,15 @@ from math import sin, cos, sqrt, floor
 random.seed()
 
 CONDITION = True
-GENERATIONS = 20
+
 POPULATION_SIZE = 20
-MUTATION_CHANCE = 1.0  # mutation between 0 and 100 percent
-if MUTATION_CHANCE > 100:
-        MUTATION_CHANCE = 100.0
-if MUTATION_CHANCE < 0:
-        MUTATION_CHANCE = 0.0
 
-CROSSOVER_CHANCE = 80.0
-if CROSSOVER_CHANCE > 100:
-        CROSSOVER_CHANCE = 100.0
-if CROSSOVER_CHANCE < 0:
-        CROSSOVER_CHANCE = 0.0
 
-F=1.2 #Fe[0,2]
-if F>2.0:
-        F=2.0
-if F<0.0:
-        F=0.0
-NOTE = "Differential Evolution"
+NOTE = "Simulated Annealing - linear"
 print("PARAMETERS\n")
 print(NOTE)
-print("Generations: ", GENERATIONS)
-print("Population size: ", POPULATION_SIZE)
-print("Mutation chance: ", MUTATION_CHANCE)
-print("Crossover chance: ", CROSSOVER_CHANCE)
+
+
 print("\n")
 
 
@@ -51,29 +34,40 @@ best_fit = []
 #generate the beginning population
 genPopulation(genes)
 
+#starting temp
+t0 = 100.0
+k = 0
+tk = t0
+cooling_factor=0.8
 
-for i in range(GENERATIONS):
+while tk>0:
 
-    print(int(((i+1)/GENERATIONS)*100), "%", "DONE", end="\r")
+    print(int(100-((tk)/t0)*100), "%", "DONE", end="\r")
     #genes[:] = []
-    
-    #for x in genes:
-    #    print(x.fitness)
 
-    #delete worse half of survivors
+
     for n in range(len(genes)):
-        x = genes[n]
-        (a,b,c) = random.sample(genes, 3)
+        #generate a random neighbour
         g = Gene()
-        g.setParameters(a1=a.a1+F*(b.a1-c.a1),a2=a.a2+F*(b.a2-c.a2))
-        if g.fitness < x.fitness:
+        x=genes[n]
+        #if it's better set it as new
+        difference = g.fitness - x.fitness
+        if difference < 0:
+            genes[n]=g
+        else:
+            if random.random() < (1-exp(difference/tk)):
                 genes[n] = g
+
 
     #sort
     genes.sort(key=lambda x: x.fitness, reverse=False)
+    #for x in genes:
+    #    print(x.fitness)
     #store best
     best_fit.append(genes[0].fitness)
-    
+    k += 1
+    tk-=k*cooling_factor
+
 DELTA = best_fit[0]-best_fit[len(best_fit)-1]
 
 #PLOTTING
@@ -108,7 +102,7 @@ plt.figure()
 plt.title(NOTE+"\nPopulation = "+str(POPULATION_SIZE) +
           ", $\\Delta = $" + str(DELTA)[0:4])
 
-plt.xlabel("Generation")
+plt.xlabel("Iteration")
 plt.ylabel("Fitness")
 plt.plot(
     best_fit, label="$\sum \sqrt{\\tau_1^2+\\tau_2^2+\\tau_3^2+\\tau_4^2}$")
